@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>和信醫院深耕計畫 - 財會系統 AI 即時提醒工具 (Prototype)</title>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+    <style>
+        :root {
+            --bg-main: #f1f5f9;      /* 明亮淺灰背景 */
+            --bg-card: #ffffff;      /* 純白卡片，極高對比 */
+            --bg-chat: #e2e8f0;      /* 側邊欄淺灰 */
+            --cyan: #0284c7;         /* 深海藍 */
+            --emerald: #15803d;      /* 控制得宜/合規通過：深綠 */
+            --amber: #b45309;        /* 警告：深橘 */
+            --rose: #b91c1c;         /* 風險/阻斷：深紅 */
+            --text-main: #0f172a;    /* 極深灰文字 */
+            --text-muted: #475569;   /* 次要文字 */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+        /* 左側欄：模擬情境列表 */
+        .chat-sidebar { width: 420px; background-color: var(--bg-chat); border-right: 2px solid #cbd5e1; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 24px; border-bottom: 2px solid #cbd5e1; background-color: #cbd5e1; }
+        .sidebar-header h2 { font-size: 1.3rem; color: #0369a1; display: flex; align-items: center; gap: 10px; font-weight: bold; }
+        .chat-history { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+        .msg { padding: 16px; border-radius: 10px; max-width: 95%; line-height: 1.6; font-size: 1.05rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); background-color: #ffffff; border-left: 5px solid var(--cyan); }
+        
+        .skills-container { display: flex; flex-direction: column; gap: 14px; margin-top: 10px; }
+        .scenario-card { background-color: #ffffff; border: 2px solid #94a3b8; color: var(--text-main); padding: 16px; border-radius: 8px; text-align: left; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 8px; }
+        .scenario-card:hover { border-color: var(--cyan); background-color: #f8fafc; transform: translateY(-1px); }
+        .scenario-card.active { border-color: #0284c7; background-color: #f0f9ff; box-shadow: 0 4px 12px rgba(2,132,199,0.15); }
+        .scenario-title { font-size: 1.1rem; font-weight: bold; color: #0369a1; display: flex; align-items: center; gap: 8px; }
+        .scenario-desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; }
+
+        /* 右側前端系統模擬區 */
+        .dashboard-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background-color: var(--bg-main); }
+        .dash-header { padding: 20px 40px; background-color: #ffffff; border-bottom: 2px solid #cbd5e1; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .dash-title h1 { font-size: 1.6rem; font-weight: bold; color: #0369a1; letter-spacing: 0.5px; }
+        .status-badge { background-color: rgba(2, 132, 199, 0.1); border: 2px solid var(--cyan); color: var(--cyan); padding: 6px 14px; border-radius: 20px; font-size: 0.95rem; font-weight: bold; display: flex; align-items: center; gap: 6px; }
+        
+        .dash-content { flex: 1; padding: 30px 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 25px; }
+
+        /* API 狀態網格 */
+        .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .metric-card { background-color: var(--bg-card); padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .metric-label { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 6px; font-weight: bold; }
+        .metric-value { font-size: 1.8rem; font-weight: 800; color: var(--text-main); }
+        .metric-trend { font-size: 0.9rem; margin-top: 6px; display: flex; align-items: center; gap: 4px; font-weight: bold; }
+
+        /* 總帳表單模擬 */
+        .summary-grid { display: grid; grid-template-columns: 1.4fr 1.7fr; gap: 20px; }
+        .section-card { background-color: var(--bg-card); padding: 26px; border-radius: 12px; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 16px; }
+        .section-card h3 { font-size: 1.25rem; color: #0369a1; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; font-weight: bold; }
+        
+        .voucher-form { display: flex; flex-direction: column; gap: 16px; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #cbd5e1; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-label { font-size: 1rem; font-weight: bold; color: var(--text-main); margin-bottom: 6px; display: block; }
+        .form-input { width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 1.05rem; background-color: white; color: var(--text-main); font-weight: bold; transition: border-color 0.2s; }
+        .form-input:focus { border-color: var(--cyan); outline: none; }
+
+        /* AI Popover 提醒框 */
+        .alert-popover { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); border-radius: 8px; padding: 20px; font-size: 1.05rem; line-height: 1.7; display: flex; flex-direction: column; gap: 10px; border-left: 6px solid transparent; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .alert-popover b { font-weight: 700; color: inherit; }
+        .alert-popover.danger { background-color: #fef2f2; border: 1px solid #fca5a5; border-left-color: var(--rose); color: #991b1b; }
+        .alert-popover.warning { background-color: #fffbeb; border: 1px solid #fcd34d; border-left-color: var(--amber); color: #92400e; }
+        .alert-popover.success { background-color: #f0fdf4; border: 1px solid #86efac; border-left-color: var(--emerald); color: #166534; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <!-- 左側欄：模擬情境列表 -->
+    <div class="chat-sidebar">
+        <div class="sidebar-header">
+            <h2><i data-lucide="shield-alert"></i> 模擬情境列表</h2>
+        </div>
+        <div class="chat-history">
+            <div class="msg">請點擊下方情境，模擬同仁在立帳當下會自動跳出的警示與防錯機制：</div>
+            
+            <div class="skills-container">
+                <div class="scenario-card" id="card-overBudget" onclick="selectScenario('overBudget')">
+                    <div class="scenario-title"><i data-lucide="alert-triangle" style="color:var(--rose);"></i> <span>模擬情境 A</span></div>
+                    <div class="scenario-desc">同仁建置自費高值耗材採購傳票 (觸發預算偏離事中控制)</div>
+                </div>
+                
+                <div class="scenario-card" id="card-wrongAccount" onclick="selectScenario('wrongAccount')">
+                    <div class="scenario-title"><i data-lucide="help-circle" style="color:var(--amber);"></i> <span>模擬情境 B</span></div>
+                    <div class="scenario-desc">同仁誤將『教學醫院補助款』登錄為『租金收入』 (觸發防錯阻斷)</div>
+                </div>
+                
+                <div class="scenario-card" id="card-normal" onclick="selectScenario('normal')">
+                    <div class="scenario-title"><i data-lucide="check-circle" style="color:var(--emerald);"></i> <span>模擬情境 C</span></div>
+                    <div class="scenario-desc">同仁常規核銷醫藥研究經費 (觸發專款專用自動化合規審查)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右側欄：前端系統模擬大屏 -->
+    <div class="dashboard-main">
+        <div class="dash-header">
+            <div class="dash-title">
+                <h1>和信醫院財會系統 AI 即時提醒工具 (Prototype)</h1>
+            </div>
+            <div class="status-badge"><i data-lucide="radio"></i> API Webhook 已掛載</div>
+        </div>
+
+        <div class="dash-content">
+            <!-- 頂部 API 監控指標 -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">🔌 智慧 API 連接狀態</div>
+                    <div class="metric-value" style="color:var(--emerald);">Webhook Active</div>
+                    <div class="metric-trend num-up"><i data-lucide="check"></i> 前端與封閉型模型已串接</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">⚡ AI 合規檢索即時響應</div>
+                    <div class="metric-value">42 ms</div>
+                    <div class="metric-trend cost-save"><i data-lucide="zap"></i> 低侵入式整合、過帳無感卡頓</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">🛡️ 院內規章制度 RAG 知識庫</div>
+                    <div class="metric-value">115 條規章條文</div>
+                    <div class="metric-trend" style="color:var(--text-muted);"><i data-lucide="book-open"></i> 已掛載最新內部管理辦法</div>
+                </div>
+            </div>
+
+            <!-- 下方總帳登打與提醒區 -->
+            <div class="summary-grid">
+                <!-- 總帳系統登打介面 -->
+                <div class="section-card">
+                    <h3><i data-lucide="terminal"></i> 總帳前端系統傳票登錄界面 (模擬畫面)</h3>
+                    <div class="voucher-form">
+                        <div class="form-row">
+                            <div><label class="form-label">傳票日期</label><input type="text" class="form-input" value="2026-06-25" readonly></div>
+                            <div><label class="form-label">會計科目</label><input type="text" class="form-input" id="v-account" value="請點選左側情境進行模擬" readonly></div>
+                        </div>
+                        <div class="form-row">
+                            <div><label class="form-label">立帳金額 (元)</label><input type="text" class="form-input" id="v-amount" value="0" readonly></div>
+                            <div><label class="form-label">製單同仁編號</label><input type="text" class="form-input" value="ACC-0412" readonly></div>
+                        </div>
+                        <div>
+                            <label class="form-label">摘要說明</label>
+                            <input type="text" class="form-input" id="v-summary" value="等待同仁登打..." readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI 即時提醒視窗 (動態跳出) -->
+                <div class="section-card" style="background-color: #f8fafc;">
+                    <h3><i data-lucide="cpu"></i> AI API 即時合規檢索回饋</h3>
+                    <div id="alert-display-zone" style="flex: 1; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 1.1rem;">
+                        <div style="text-align: center;"><i data-lucide="eye" style="width:40px; height:40px; margin-bottom:10px; color:#94a3b8;"></i><br>請點選左側模擬情境，<br>即可觀看立帳當下的即時提醒。</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function selectScenario(type) {
+            document.querySelectorAll('.scenario-card').forEach(card => card.classList.remove('active'));
+            document.getElementById(`card-${type}`).classList.add('active');
+
+            const alertZone = document.getElementById('alert-display-zone');
+
+            if(type === 'overBudget') {
+                document.getElementById('v-account').value = "5132-材料成本-其他成本";
+                document.getElementById('v-amount').value = "42,500,000";
+                document.getElementById('v-summary').value = "採購中央庫房自費手術特定高值耗材一批";
+                
+                alertZone.innerHTML = `
+                    <div class="alert-popover danger">
+                        <div style="font-weight:bold; font-size:1.2rem; display:flex; align-items:center; gap:8px;">
+                            <i class='lucide-shield-x'></i> 🔴 AI 財務內控即時預警：材料成本偏離！
+                        </div>
+                        <div style="margin-top: 5px;">
+                            <b>【異常特徵識別】</b> 本期材料成本之『其他成本（衛材）』累計已達 $42,500,000，高於同期預算數，<b>預算達成率高達 106.3%</b>。<br><br>
+                            <b>【RAG 內部規章檢索】</b> 依據《資材管理及庫存安全預警辦法》第14條，特定庫房周轉天數已由 14 天拉長至 18 天（囤貨率異常 +28.5%）。<br><br>
+                            <b>【事中控制效益】</b> 系統在同仁儲存傳票當下實施警示，自動通報資材部主管，有效避免盲目囤貨積壓，防範財務風險於未然。
+                        </div>
+                    </div>
+                `;
+            } else if(type === 'wrongAccount') {
+                document.getElementById('v-account').value = "4211-租金收入";
+                document.getElementById('v-amount').value = "1,550,000";
+                document.getElementById('v-summary').value = "入帳1-5月教學計畫成效獎勵及補助款";
+
+                alertZone.innerHTML = `
+                    <div class="alert-popover warning">
+                        <div style="font-weight:bold; font-size:1.2rem; display:flex; align-items:center; gap:8px;">
+                            <i class='lucide-alert-circle'></i> 🟠 AI 智能防錯提醒：會計科目誤登！
+                        </div>
+                        <div style="margin-top: 5px;">
+                            <b>【語意錯誤糾正】</b> 系統偵測到同仁輸入的摘要包含『教學計畫補助款』，打入時自動啟動前端邏輯勾稽。<br><br>
+                            <b>【實務校正】</b> 大模型自動識別該筆收入的摘要註明為『教學計畫補助款』，但登錄科目卻為『租金收入』，<b>判定為收入本質與摘要內容完全不符</b>。<br><br>
+                            <b>【立帳源頭防錯】</b> 系統於立帳當下自動實施防錯阻斷，建議同仁將科目更正為 <b>『4151-教學補助計畫案收入』</b>，確保帳務精準度達到 100%。
+                        </div>
+                    </div>
+                `;
+            } else if(type === 'normal') {
+                document.getElementById('v-account').value = "4152-醫藥研究收入-國科會計畫";
+                document.getElementById('v-amount').value = "8,500,000";
+                document.getElementById('v-summary').value = "核銷政府衛福部及國科會期中研究計畫案配合款";
+
+                alertZone.innerHTML = `
+                    <div class="alert-popover success">
+                        <div style="font-weight:bold; font-size:1.2rem; display:flex; align-items:center; gap:8px;">
+                            <i class='lucide-check-circle'></i> 🟢 AI 專款專用合規審查：通過
+                        </div>
+                        <div style="margin-top: 5px;">
+                            <b>【內控自動化勾稽】</b> 經大模型即時勾稽核對，本年度累計院外研究計畫共計 14 案，期中結轉執行率達 <b>84.2%</b>（較去年同期提升 3.4%）。<br><br>
+                            <b>【法規遵循度評定】</b> 全量項目符合專款專用規範，無跨期挪用風險，符合衛福部合規內控標準，系統自動放行允許常規過帳。
+                        </div>
+                    </div>
+                `;
+            }
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>
