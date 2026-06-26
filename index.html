@@ -122,7 +122,7 @@
 
 <!-- === 漂亮按鈕開始 === -->
 <style>
-  /* 按鈕外層的容器，用來置中與微調間距 */
+  /* 外層容器 */
   .demo-container {
     text-align: center;
     margin: 40px auto;
@@ -130,60 +130,71 @@
   }
   
   .demo-title {
-    color: #333;
-    font-size: 1.2rem;
+    color: #444;
+    font-size: 1.1rem;
     margin-bottom: 20px;
     font-weight: 600;
   }
 
-  /* 按鈕的基本樣式 */
+  /* 按鈕列：強制並排 */
+  .demo-btn-group {
+    display: flex;
+    justify-content: center; /* 置中對齊 */
+    gap: 20px;               /* 兩個按鈕之間的間距 */
+    flex-wrap: nowrap;       /* 強制不換行（並排） */
+  }
+
+  /* 按鈕基礎樣式（顏色調暗、低調質感） */
   .btn-demo {
     display: inline-block;
-    padding: 12px 28px;
-    margin: 10px 15px;
-    font-size: 1rem;
-    font-weight: bold;
+    padding: 12px 24px;
+    font-size: 0.95rem;
+    font-weight: 500;
     color: #ffffff;
-    text-decoration: none; /* 移除超連結底線 */
-    border-radius: 50px;  /* 圓角造型 */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* 柔和陰影 */
-    transition: all 0.3s ease; /* 讓動畫變流暢 */
+    text-decoration: none;   /* 移除底線 */
+    border-radius: 6px;      /* 改為洗鍊的微圓角 */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* 微弱陰影 */
+    transition: all 0.25s ease;
+    white-space: nowrap;     /* 文字不換行 */
     cursor: pointer;
   }
 
-  /* 按鈕一：漸層藍色（適合例如 AI 聊天、科技感網頁） */
-  .btn-blue {
-    background: linear-gradient(135deg, #007aff, #0051a8);
+  /* 按鈕一：內斂深藍 (Midnight Blue) */
+  .btn-dark-blue {
+    background-color: #1e293b;
   }
 
-  /* 按鈕二：漸層紫色（適合例如 數據、財經、其他展示） */
-  .btn-purple {
-    background: linear-gradient(135deg, #8e2de2, #4a00e0);
+  /* 按鈕二：質感深灰 (Charcoal) */
+  .btn-charcoal {
+    background-color: #475569;
   }
 
-  /* 滑鼠游標移上去時的特效 (Hover) */
+  /* 滑鼠懸停特效（調暗風格：微亮即可） */
   .btn-demo:hover {
-    transform: translateY(-3px); /* 向上微浮 */
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25); /* 陰影變深 */
-    filter: brightness(1.1); /* 稍微變亮 */
+    transform: translateY(-2px); /* 輕微上浮 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    filter: brightness(1.15);     /* 微幅變亮提燈效果 */
   }
 
-  /* 手機版排版優化 */
-  @media (max-width: 600px) {
+  /* RWD 手機版極端寬度優化（若螢幕太窄才縮小字體，依然維持並排） */
+  @media (max-width: 400px) {
+    .demo-btn-group {
+      gap: 10px;
+    }
     .btn-demo {
-      display: block;
-      margin: 15px auto;
-      max-width: 200px;
+      padding: 10px 16px;
+      font-size: 0.85rem;
     }
   }
 </style>
 
 <div class="demo-container">
   <p class="demo-title">🔗 其他demo網頁</p>
-  
-  <!-- ⚠️ 請記得把下面的 href 檔名，改成您實際的新檔案名稱 -->
-  <a href="ai_finance_chat_view.html" class="btn-demo btn-blue">👉 開放式問題</a>
-  <a href="ai_finance_alert_tool.html" class="btn-demo btn-purple">👉 AI 即時提醒工具</a>
+  <div class="demo-btn-group">
+      <!-- ⚠️ 請記得把下面的 href 檔名，改成您實際的新檔案名稱 -->
+      <a href="ai_finance_chat_view.html" class="btn-demo btn-dark-blue">👉 開放式問題</a>
+      <a href="ai_finance_alert_tool.html" class="btn-demo btn-charcoal">👉 AI 即時提醒工具</a>
+  </div>
 </div>
 <!-- === 漂亮按鈕結束 === -->
 
