@@ -119,6 +119,76 @@
                     <i data-lucide="combine"></i> <span>Skill 1-5：各科經營損益多元檢視</span>
                 </button>
             </div>
+
+<!-- === 漂亮按鈕開始 === -->
+<style>
+  /* 按鈕外層的容器，用來置中與微調間距 */
+  .demo-container {
+    text-align: center;
+    margin: 40px auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  
+  .demo-title {
+    color: #333;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+
+  /* 按鈕的基本樣式 */
+  .btn-demo {
+    display: inline-block;
+    padding: 12px 28px;
+    margin: 10px 15px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #ffffff;
+    text-decoration: none; /* 移除超連結底線 */
+    border-radius: 50px;  /* 圓角造型 */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* 柔和陰影 */
+    transition: all 0.3s ease; /* 讓動畫變流暢 */
+    cursor: pointer;
+  }
+
+  /* 按鈕一：漸層藍色（適合例如 AI 聊天、科技感網頁） */
+  .btn-blue {
+    background: linear-gradient(135deg, #007aff, #0051a8);
+  }
+
+  /* 按鈕二：漸層紫色（適合例如 數據、財經、其他展示） */
+  .btn-purple {
+    background: linear-gradient(135deg, #8e2de2, #4a00e0);
+  }
+
+  /* 滑鼠游標移上去時的特效 (Hover) */
+  .btn-demo:hover {
+    transform: translateY(-3px); /* 向上微浮 */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25); /* 陰影變深 */
+    filter: brightness(1.1); /* 稍微變亮 */
+  }
+
+  /* 手機版排版優化 */
+  @media (max-width: 600px) {
+    .btn-demo {
+      display: block;
+      margin: 15px auto;
+      max-width: 200px;
+    }
+  }
+</style>
+
+<div class="demo-container">
+  <p class="demo-title">🔗 觀看我的其他獨立專案 Demo</p>
+  
+  <!-- ⚠️ 請記得把下面的 href 檔名，改成您實際的新檔案名稱 -->
+  <a href="網頁二檔名.html" class="btn-demo btn-blue">👉 瀏覽網頁二</a>
+  <a href="網頁三檔名.html" class="btn-demo btn-purple">👉 瀏覽網頁三</a>
+</div>
+<!-- === 漂亮按鈕結束 === -->
+
+
+
             
             <div id="loading-msg"><i data-lucide="refresh-cw" class="spin"></i> <span id="load-text">大模型運算中...</span></div>
         </div>
