@@ -223,11 +223,70 @@
         <div class="dash-content" id="dashboard">
             <div class="metrics-grid" id="top-metrics"></div>
 
-            <div class="summary-grid">
-                <div class="section-card">
-                    <h3 id="panel-title"><i data-lucide="cpu"></i> AI 營運驅動因果分析</h3>
-                    <div class="ai-text" id="ai-comment-box"></div>
-                </div>
+            <!-- 左右分割面板：左邊放數據圖表，右邊放人機協同審查區 -->
+<div class="summary-grid">
+    
+    <!-- 左側：原有數據或圖表區 -->
+    <div class="section-card">
+        <h3><i data-lucide="bar-chart-3"></i> 醫務收入與申報分析</h3>
+        <!-- 這裡保留您原本的 BI 表格或數據內容 -->
+        <p class="text-muted">（此處維持您原本的 1~5 月總帳多維度表格）</p>
+    </div>
+
+    <!-- 右側：AI 預審與手動覆核發佈區 -->
+    <div class="section-card">
+        <h3><i data-lucide="brain-circuit"></i> AI 因果分析與官方發佈審查</h3>
+        
+        <!-- 1. AI 原始草案（唯讀對照用） -->
+        <div class="review-box" style="background-color: #f0f9ff; border-color: #bae6fd;">
+            <div class="review-title">
+                <span>🤖 AI 自動產生的初步草案 (唯讀)</span>
+                <span class="badge-pending">待審核</span>
+            </div>
+            <div class="ai-text" id="ai-draft-text">
+                累計 1~5 月醫務收入較去年同期成長 4.2%，惟 5 月份受內科系主診斷碼申報規格更新影響，導致部分健保申報點數產生<b>暫時性遞延</b>。整體健保點數回推率仍維持在 92.5% 之安全水位。
+            </div>
+            <button class="btn-secondary" onclick="copyToEditor()" style="align-self: flex-start;">
+                <i data-lucide="copy" style="width:14px; height:14px; display:inline-block; vertical-align:middle;"></i> 一鍵複製草案至編輯區
+            </button>
+        </div>
+
+        <!-- 2. 財務人員手動編修區 -->
+        <div class="review-box">
+            <div class="review-title">✍️ 財務審查人編輯區</div>
+            <textarea id="official-editor" class="textarea-official" placeholder="請點選上方按鈕帶入 AI 草案，或在此直接輸入修正後的官方報告說明..."></textarea>
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                <input type="text" id="reviewer-name" value="張三 (財務部經理)" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px; font-size:0.9rem; width:160px;">
+                <button class="btn-primary-submit" onclick="publishOfficialReport()">
+                    <i data-lucide="check-circle" style="width:18px; height:18px;"></i> 簽核並發佈為官方定稿
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. 大螢幕最終發佈區 (Official) -->
+        <div class="official-release-card" id="official-release-zone">
+            <div class="review-title" style="margin-bottom: 8px;">
+                <span style="color:var(--emerald); display:flex; align-items:center; gap:6px;">
+                    <i data-lucide="shield-check"></i> 📢 大螢幕最終呈現 (Official)
+                </span>
+                <span id="publish-status" class="badge-pending">顯示 AI 預審草案</span>
+            </div>
+            <div class="ai-text" id="final-display-text" style="color: var(--text-muted); font-style: italic;">
+                （尚未簽核發佈，畫面上暫時預覽 AI 草案...）
+            </div>
+            
+            <!-- 審計軌跡 -->
+            <div class="audit-trail" id="audit-trail-zone" style="display:none;">
+                <span>👤 審核人：<b id="log-user">-</b></span>
+                <span>📅 簽核時間：<b id="log-time">-</b></span>
+                <span>🛡️ 狀態：<b>已鎖定不可篡改</b></span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
                 
                 <div class="section-card" id="detail-data-card"></div>
             </div>
